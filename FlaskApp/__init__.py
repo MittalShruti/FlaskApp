@@ -1,20 +1,15 @@
 #!/usr/bin/env python
+
 import logging
-import os
-from os import listdir
-from os.path import isfile, join
 from flask import Flask, request, jsonify
 from flaskext.mysql import MySQL
 import urllib, cStringIO
-import numpy   # /usr/local/lib/python2.7/dist-packages/numpy
+import numpy  
 from PIL import Image
 import keras
 from keras.models import load_model
-import time
-import atexit
 from apscheduler.schedulers.background import BackgroundScheduler
-# from apscheduler.triggers.interval import IntervalTrigger
-# from apscheduler.schedulers.blocking import BlockingScheduler
+
 app = Flask(__name__)
 @app.route("/")
 def Authenticate():
@@ -40,7 +35,7 @@ def Authenticate():
             r = im[:,:,0] #Slicing to get R data
             g = im[:,:,1] #Slicing to get G data
             b = im[:,:,2] #Slicing to get B data
-            out = numpy.array([[r] + [g] + [b]], numpy.uint8) #Creating array with shape (3, 100, 100)
+            out = numpy.array([[r] + [g] + [b]], numpy.uint8) 
             out1 = out.astype('float32')/255
             predictions = model.predict_classes(out1)
             if predictions[0]==0: #OLX-watermarked
@@ -53,12 +48,13 @@ def Authenticate():
 @app.before_first_request
 def initialize():
     scheduler = BackgroundScheduler()
-    scheduler.start()
     scheduler.add_job(Authenticate,'interval',
     days=1,
     start_date='2016-09-13 04:00:00',
     replace_existing=True)
+    scheduler.start()
+
 if __name__ == "__main__":
 # Shut down the scheduler when exiting the app
-    atexit.register(lambda: scheduler.shutdown())
+#    atexit.register(lambda: scheduler.shutdown())
     app.run()
