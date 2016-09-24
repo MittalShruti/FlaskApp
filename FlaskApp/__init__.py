@@ -13,13 +13,14 @@ from apscheduler.schedulers.background import BackgroundScheduler
 app = Flask(__name__)
 @app.route("/")
 def Authenticate():
+    trained_model = '/var/www/FlaskApp/FlaskApp/shallowlargedropout.h5'  #trained on images without listup watermark
     mysql = MySQL()
     app.config['MYSQL_DATABASE_USER'] = 'saurabh'
     app.config['MYSQL_DATABASE_PASSWORD'] = 'listup'
     app.config['MYSQL_DATABASE_DB'] = 'trovo'
     app.config['MYSQL_DATABASE_HOST'] = '173.194.108.135'
     mysql.init_app(app)
-    model = keras.models.load_model('/var/www/FlaskApp/FlaskApp/listupdeeplmodellargerdropout.h5')
+    model = keras.models.load_model(trained_model)
     conn = mysql.connect()
     cursor = conn.cursor()
     cursor.execute("SELECT image_filename, productid FROM product_image WHERE date(created_at)=DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)")
